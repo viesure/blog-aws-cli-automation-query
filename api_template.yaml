@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  TestApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: viesure-blog-gateway
+  ApiDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn: ApiRequest
+    Properties:
+      RestApiId:
+        Ref: TestApi
+      StageName: test
+  ApiResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId:
+        Ref: TestApi
+      ParentId: !GetAtt TestApi.RootResourceId
+      PathPart: helloworld
+  ApiRequest:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: "{\n    \"statusCode\": 200\n}"
+        IntegrationResponses:
+          - StatusCode: 200
+      MethodResponses:
+        - StatusCode: 200
+      ResourceId:
+        Ref: ApiResource
+      RestApiId:
+        Ref: TestApi
